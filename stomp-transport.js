@@ -1,5 +1,4 @@
 /* Copyright (c) 2014 Luca Lanziani, MIT License */
-/*jslint node: true */
 "use strict";
 
 var util = require('util');
@@ -7,14 +6,14 @@ var util = require('util');
 var _     = require('underscore');
 var Stomp = require('stomp-client');
 
-var CHANNEL_RES = "/queue/%s_res";
-var CHANNEL_ACT = "/queue/%s_act";
-
 module.exports = function( options ) {
   var seneca = this;
   var plugin = 'stomp-transport';
 
   var so = seneca.options();
+
+  var ACT_CHANNEL = "/queue/%s_act";
+  var RES_CHANNEL = "/queue/%s_res";
 
   options = seneca.util.deepextend(
     {
@@ -34,10 +33,6 @@ module.exports = function( options ) {
   seneca.add({role:'transport', hook:'listen', type:'stomp'}, hook_listen_stomp);
   seneca.add({role:'transport', hook:'client', type:'stomp'}, hook_client_stomp);
 
-  // Legacy patterns
-  seneca.add({role:'transport', hook:'listen', type:'queue'}, hook_listen_stomp);
-  seneca.add({role:'transport', hook:'client', type:'queue'}, hook_client_stomp);
-
 
   function hook_listen_stomp(args, done) {
     var seneca         = this;
@@ -45,14 +40,14 @@ module.exports = function( options ) {
     var listen_options = seneca.util.clean(_.extend({}, options[type], args));
 
     function listen_topic(topic) {
-      var stomp_in  = make_stomp_client(listen_options);
-      var stomp_out = make_stomp_client(listen_options);
+      var channel_in = util.format(ACT_CHANNEL, topic);
+      var channel_out = util.format(RES_CHANNEL, topic);
 
-      var channel_in = util.format(CHANNEL_ACT, topic);
-      var channel_out = util.format(CHANNEL_RES, topic);
+      var stomp_in  = make_stomp_client(listen_options, 'listen_in');
+      var stomp_out = make_stomp_client(listen_options, 'listen_out');
 
       stomp_in.on('connect', function () {
-        seneca.log.info('listen', 'subscribe', channel_in, seneca);
+        seneca.log.info('listen', 'connected', channel_in, seneca);
         stomp_in.subscribe(channel_in, function (msgstr, headers) {
           var data = tu.parseJSON(seneca, 'listen-'+type, msgstr);
 
@@ -66,10 +61,10 @@ module.exports = function( options ) {
 
       stomp_out.on('connect', function () {
         seneca.log.debug('listen', 'connect', 'out', topic, seneca);
-        connect_stomp(stomp_in, 'listen_in');
+        stomp_in.connect();
       });
 
-      connect_stomp(stomp_out, 'listen_out');
+      stomp_out.connect();
 
     }
 
@@ -91,17 +86,16 @@ module.exports = function( options ) {
     tu.make_client(make_send, client_options, clientdone);
 
     function make_send(spec, topic, send_done) {
-      var stomp_in  = make_stomp_client(client_options);
-      var stomp_out = make_stomp_client(client_options);
+      var channel_in = util.format(RES_CHANNEL, topic);
+      var channel_out = util.format(ACT_CHANNEL, topic);
 
-      var channel_in = util.format(CHANNEL_RES, topic);
-      var channel_out = util.format(CHANNEL_ACT, topic);
-      var client;
+      var stomp_in  = make_stomp_client(client_options, 'client_in');
+      var stomp_out = make_stomp_client(client_options, 'client_out');
 
       stomp_in.on('connect', function (session_id) {
         seneca.log.debug('client', 'connected', channel_in, client_options, seneca);
-        stomp_in.subscribe(channel_in, function (msgstr) {
 
+        stomp_in.subscribe(channel_in, function (msgstr) {
           var input = tu.parseJSON(seneca, 'client-'+type, msgstr);
           seneca.log.info('client', 'input', input);
           tu.handle_response(seneca, input, client_options);
@@ -120,21 +114,17 @@ module.exports = function( options ) {
 
       });
 
-      connect_stomp(stomp_in, 'client_in');
-      connect_stomp(stomp_out, 'client_out');
+      stomp_out.connect();
+      stomp_in.connect();
+
     }
   }
 
-  function make_stomp_client(listen_options) {
-    return new Stomp(listen_options.host, listen_options.port);
-  }
-
-  function connect_stomp(client, identifier) {
-    client
-      .on('error', function (error) {
-        seneca.log.error('transport', 'stomp', identifier, error.message, error.details);
-      })
-      .connect();
+  function make_stomp_client(options, identifier) {
+    var client = new Stomp(options.host, options.port);
+    client.on('error', function (error) {
+      seneca.log.error('transport', 'stomp', identifier, error.message);
+    });
 
     seneca.add('role:seneca,cmd:close', function (close_args, done) {
       var closer = this;
@@ -142,7 +132,7 @@ module.exports = function( options ) {
       client.disconnect();
       closer.prior(close_args, done);
     });
-
+    return client;
   }
 
   return {
