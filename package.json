@@ -1,6 +1,6 @@
 {
   "name": "seneca-stomp-transport",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Seneca stomp transport",
   "main": "stomp-transport.js",
   "scripts": {
