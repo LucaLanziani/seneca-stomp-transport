@@ -1,0 +1,34 @@
+{
+  "name": "seneca-stomp-transport",
+  "version": "0.0.1",
+  "description": "Seneca stomp transport",
+  "main": "stomp-transport.js",
+  "scripts": {
+    "test": "node_modules/.bin/mocha test/*.test.js"
+  },
+  "keywords": [
+    "seneca",
+    "transport",
+    "plugin",
+    "stomp"
+  ],
+  "author": "Luca Lanziani (http://lanziani.com)",
+  "license": "MIT",
+  "dependencies": {
+    "stomp-client": "^0.5.0",
+    "underscore": "~1.6.0"
+  },
+  "peerDependencies": {
+    "seneca": "*"
+  },
+  "devDependencies": {
+    "mocha": "~1.20.1",
+    "seneca": "~0.5.20",
+    "seneca-transport-test": "~0.1.2"
+  },
+  "files": [
+    "README.md",
+    "LICENSE.txt",
+    "stomp-transport.js"
+  ]
+}
