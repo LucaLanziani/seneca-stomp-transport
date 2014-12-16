@@ -18,10 +18,12 @@ module.exports = function( options ) {
   options = seneca.util.deepextend(
     {
       stomp: {
-        timeout:  so.timeout ? so.timeout-555 :  22222,
-        type:     'stomp',
-        host:     'localhost',
-        port:     61613
+        timeout:     so.timeout ? so.timeout-555 :  22222,
+        type:        'stomp',
+        host:        'localhost',
+        port:        61613,
+        act_channel: ACT_CHANNEL,
+        res_channel: RES_CHANNEL
       },
     },
     so.transport,
@@ -40,8 +42,8 @@ module.exports = function( options ) {
     var listen_options = seneca.util.clean(_.extend({}, options[type], args));
 
     function listen_topic(topic) {
-      var channel_in = util.format(ACT_CHANNEL, topic);
-      var channel_out = util.format(RES_CHANNEL, topic);
+      var channel_in = util.format(listen_options.act_channel, topic);
+      var channel_out = util.format(listen_options.res_channel, topic);
 
       var stomp_in  = make_stomp_client(listen_options, 'listen_in');
       var stomp_out = make_stomp_client(listen_options, 'listen_out');
@@ -86,8 +88,8 @@ module.exports = function( options ) {
     tu.make_client(make_send, client_options, clientdone);
 
     function make_send(spec, topic, send_done) {
-      var channel_in = util.format(RES_CHANNEL, topic);
-      var channel_out = util.format(ACT_CHANNEL, topic);
+      var channel_in = util.format(client_options.res_channel, topic);
+      var channel_out = util.format(client_options.act_channel, topic);
 
       var stomp_in  = make_stomp_client(client_options, 'client_in');
       var stomp_out = make_stomp_client(client_options, 'client_out');
