@@ -8,11 +8,11 @@ var test = require('seneca-transport-test');
 describe('stomp-transport', function() {
 
   it('happy-any', function( fin ) {
-    test.foo_test( 'stomp-transport', require, fin, 'stomp', -6379 );
+    test.foo_test( 'stomp-transport', require, fin, 'stomp', -61613 );
   });
 
   it('happy-pin', function( fin ) {
-    test.foo_pintest( 'stomp-transport', require, fin, 'stomp', -6379 );
+    test.foo_pintest( 'stomp-transport', require, fin, 'stomp', -61613 );
   });
 
 });
