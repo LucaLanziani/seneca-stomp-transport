@@ -49,7 +49,7 @@ module.exports = function( options ) {
       var stomp_out = make_stomp_client(listen_options, 'listen_out');
 
       stomp_in.on('connect', function () {
-        seneca.log.info('listen', 'connected', channel_in, seneca);
+        seneca.log.debug('listen', 'connected', channel_in, seneca);
         stomp_in.subscribe(channel_in, function (msgstr, headers) {
           var data = tu.parseJSON(seneca, 'listen-'+type, msgstr);
 
@@ -74,7 +74,7 @@ module.exports = function( options ) {
       listen_topic(topic);
     });
 
-    seneca.log.info('listen', 'open', listen_options, seneca);
+    seneca.log.debug('listen', 'open', listen_options, seneca);
 
     done();
   }
@@ -99,7 +99,7 @@ module.exports = function( options ) {
 
         stomp_in.subscribe(channel_in, function (msgstr) {
           var input = tu.parseJSON(seneca, 'client-'+type, msgstr);
-          seneca.log.info('client', 'input', input);
+          seneca.log.debug('client', 'input', input);
           tu.handle_response(seneca, input, client_options);
         });
       });
