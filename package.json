@@ -6,6 +6,10 @@
   "scripts": {
     "test": "node_modules/.bin/mocha test/*.test.js"
   },
+  "repository": {
+    "type": "git",
+    "url":"git remote add origin https://github.com/Nss/seneca-stomp-transport.git"
+  },
   "keywords": [
     "seneca",
     "transport",
