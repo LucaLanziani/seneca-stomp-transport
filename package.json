@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url":"git remote add origin https://github.com/Nss/seneca-stomp-transport.git"
+    "url":"https://github.com/Nss/seneca-stomp-transport.git"
   },
   "keywords": [
     "seneca",
