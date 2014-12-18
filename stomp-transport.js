@@ -12,8 +12,8 @@ module.exports = function( options ) {
 
   var so = seneca.options();
 
-  var ACT_CHANNEL = "/queue/%s_act";
-  var RES_CHANNEL = "/queue/%s_res";
+  var ACT_CHANNEL = "%s_act";
+  var RES_CHANNEL = "%s_res";
 
   options = seneca.util.deepextend(
     {
