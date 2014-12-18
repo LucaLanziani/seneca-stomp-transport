@@ -9,7 +9,7 @@ For any question feel free to contact me at [@_Nss_](http://twitter.com/_Nss_)
 
 Tested on Node v0.10.33, Seneca 0.5.20, [coilmq](https://github.com/Nss/coilmq)
 
-Sponsored by [nearForm](http://www.nearform.com/)
+
 
 ## Test
 
@@ -20,12 +20,20 @@ To test this package you need a stomp broker that doesn't have constraints on th
 
 Ex.
 
+In your code directory:
+
 ```
 git clone https://github.com/Nss/coilmq.git
 cd coilmq
 PYTHONPATH=. python2 coilmq/start.py -p 61613 --debug
 ```
 
+Inside the seneca-stomp-transport directory:
+
 ```
 npm test
 ```
+
+## Acknowledgements
+
+Sponsored by [nearForm](http://www.nearform.com/)
